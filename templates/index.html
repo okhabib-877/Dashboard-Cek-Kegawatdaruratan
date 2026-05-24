@@ -3,126 +3,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Triage - Uca</title>
+    <title>MedTriage - Advanced Triage Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Gaya dasar sama seperti sebelumnya, Uca ringkas sedikit */
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
-        :root { --primary-blue: #0056b3; --light-blue: #e6f2ff; --accent-blue: #007bff; --white: #ffffff; --text-dark: #333333; --text-gray: #666666; --bg-gray: #f4f7f6; }
-        body { font-family: 'Nunito', sans-serif; background-color: var(--bg-gray); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .dashboard-container { background-color: var(--white); width: 100%; max-width: 800px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 86, 179, 0.1); overflow: hidden; }
-        .header { background-color: var(--primary-blue); color: var(--white); padding: 30px 20px; text-align: center; position: relative; }
-        .header h1 { margin: 0; font-size: 24px; font-weight: 800; }
-        .header .doctor-icon { font-size: 50px; margin-bottom: 15px; color: var(--light-blue); }
-        .content { padding: 40px 30px; min-height: 350px; position: relative; }
-        .question-section { display: none; animation: fadeIn 0.5s ease; }
-        .question-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .question-title { color: var(--primary-blue); font-size: 20px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        .question-desc { color: var(--text-gray); margin-bottom: 25px; }
-        .options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .option-btn { background-color: var(--light-blue); color: var(--primary-blue); border: 2px solid transparent; padding: 15px 10px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .option-btn i { font-size: 24px; }
-        .option-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2); }
-        .option-btn.selected { background-color: var(--primary-blue); color: var(--white); border-color: var(--primary-blue); }
-        .navigation { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 2px dashed var(--light-blue); }
-        .nav-btn { padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; }
-        .btn-prev { background-color: transparent; color: var(--text-gray); border: 2px solid var(--text-gray); }
-        .btn-next { background-color: var(--accent-blue); color: var(--white); }
-        .btn-next:disabled { background-color: #cccccc; cursor: not-allowed; }
-        .status-badge { display: inline-block; padding: 10px 30px; border-radius: 50px; font-size: 22px; font-weight: 800; color: var(--white); margin: 20px 0; }
-        .status-1 { background-color: #dc3545; } /* Merah - Resusitasi/Gawat */
-        .status-2 { background-color: #fd7e14; } /* Oranye - Emergent */
-        .status-3 { background-color: #ffc107; color: #333; } /* Kuning - Urgent */
-        .status-4 { background-color: #28a745; } /* Hijau - Less Urgent */
-        .status-5 { background-color: #17a2b8; } /* Biru - Non Urgent */
+        
+        :root { 
+            --primary-blue: #0056b3; 
+            --light-blue: #e6f2ff; 
+            --accent-blue: #007bff; 
+            --gradient-bg: linear-gradient(135deg, #0056b3 0%, #6f42c1 100%);
+            --gradient-btn: linear-gradient(135deg, #007bff 0%, #8a2be2 100%);
+            --white: #ffffff; 
+            --text-dark: #333333; 
+            --text-gray: #666666; 
+            --bg-gray: #f4f7f6; 
+            --danger: #dc3545;
+            --success: #28a745;
+            --warning: #ffc107;
+            --alert-bg: #fff3cd;
+        }
+        
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background-color: var(--bg-gray); 
+            background-image: radial-gradient(circle at top right, #e6f2ff 0%, #f4f7f6 100%);
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+
+        /* Nav & Logo */
+        .navbar {
+            position: absolute;
+            top: 30px;
+            left: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+        .navbar i { color: #dc3545; font-size: 28px; }
+
+        /* Welcome Section */
+        .welcome-container { 
+            background-color: var(--white); 
+            width: 100%; 
+            max-width: 1000px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 40px rgba(0, 86, 179, 0.15); 
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            margin-top: 60px; 
+        }
+
+        .welcome-text {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .welcome-text h1 {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-text h1 span {
+            background: var(--gradient-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-text p {
+            color: var(--text-gray);
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+
+        .welcome-image {
+            flex: 1;
+            background: var(--light-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-image img {
+            width: 80%;
+            max-width: 350px;
+            z-index: 2;
+        }
+
+        .welcome-image::after {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: var(--gradient-bg);
+            opacity: 0.05;
+            border-radius: 50%;
+            top: -25%;
+            right: -25%;
+        }
+
+        .btn-start { 
+            background: var(--gradient-btn); 
+            color: var(--white); 
+            padding: 16px 40px; 
+            border-radius: 50px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3); 
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+        }
+        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(138, 43, 226, 0.4); }
+
+        /* Pop-up Modal Assessment */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .assessment-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .assessment-card {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background: var(--gradient-bg);
+            color: var(--white);
+            padding: 25px 30px;
+            position: relative;
+        }
+        
+        .modal-header h2 { margin: 0; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+        .close-modal { position: absolute; right: 25px; top: 25px; color: var(--white); font-size: 24px; cursor: pointer; border: none; background: transparent; }
+
         .progress-bar { height: 6px; background-color: rgba(255,255,255,0.3); width: 100%; position: absolute; bottom: 0; left: 0; }
         .progress-fill { height: 100%; background-color: var(--white); width: 0%; transition: width 0.4s; }
+
+        .modal-body { padding: 40px 30px; min-height: 250px; }
+        
+        .question-section { display: none; animation: fadeIn 0.4s ease; text-align: center; }
+        .question-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .question-title { color: var(--text-dark); font-size: 22px; font-weight: 700; margin-bottom: 25px; }
+        .question-title i { color: var(--primary-blue); font-size: 28px; display: block; margin-bottom: 15px; }
+        
+        /* Input Styles */
+        .input-group { margin: 0 auto; max-width: 300px; text-align: left; }
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 20px;
+            font-family: 'Nunito', sans-serif;
+            border: 2px solid var(--light-blue);
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .input-group input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1); }
+        .input-hint { display: block; text-align: center; font-size: 14px; color: var(--text-gray); margin-top: 10px; font-weight: 600; }
+
+        /* Navigation */
+        .navigation { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 2px dashed #eee; }
+        .nav-btn { padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s; font-family: 'Nunito', sans-serif; }
+        .btn-prev { background-color: transparent; color: var(--text-gray); border: 2px solid #ddd; }
+        .btn-prev:hover { background-color: var(--bg-gray); color: var(--text-dark); }
+        .btn-next { background: var(--gradient-btn); color: var(--white); }
+        .btn-next:disabled { background: #cccccc; cursor: not-allowed; box-shadow: none; }
+
+        /* Result Styles */
+        .status-badge { display: inline-block; padding: 10px 30px; border-radius: 50px; font-size: 22px; font-weight: 800; color: var(--white); margin: 20px 0; }
+        .status-1 { background-color: #dc3545; } 
+        .status-2 { background-color: #fd7e14; } 
+        .status-3 { background-color: #ffc107; color: #333; } 
+        .status-4 { background-color: #28a745; } 
+        .status-5 { background-color: #17a2b8; } 
+
+        .advice-box { text-align: left; background: var(--light-blue); padding: 20px; border-radius: 12px; border-left: 5px solid var(--primary-blue); margin-top: 20px; }
+        .advice-box h4 { margin-top: 0; color: var(--primary-blue); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .advice-box ul { margin: 0; padding-left: 20px; color: var(--text-dark); line-height: 1.6; }
+
+        /* Action Buttons di Halaman Hasil */
+        .action-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+            font-size: 15px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .btn-hospital { background-color: var(--danger); color: white; animation: pulse 2s infinite; }
+        .btn-hospital:hover { background-color: #bd2130; transform: scale(1.05); color: white; }
+        
+        .btn-halodoc { background-color: #e40046; color: white; }
+        .btn-halodoc:hover { background-color: #bd0038; transform: scale(1.05); color: white; }
+        
+        .btn-outline { background-color: var(--light-blue); color: var(--primary-blue); }
+        .btn-outline:hover { background-color: #cce5ff; transform: scale(1.05); }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* CSS UNTUK FITUR AKURASI & SIMULASI */
+        .skip-hint { display: block; font-size: 13px; color: var(--warning); margin-top: 5px; font-weight: 700; }
+        
+        /* Bar akurasi utama tetap di-hide */
+        .confidence-container { display: none; margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 12px; border: 1px solid #dee2e6; }
+        .confidence-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); font-size: 14px;}
+        .confidence-bar-bg { width: 100%; background-color: #e9ecef; border-radius: 50px; height: 10px; overflow: hidden; }
+        .confidence-bar-fill { height: 100%; border-radius: 50px; background: var(--gradient-btn); transition: width 1s ease-in-out; width: 0%; }
+        
+        .insight-box { margin-top: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 12px; text-align: left; font-size: 14px; display: none; line-height: 1.6; border: 1px solid #dee2e6;}
+        .highlight-acuity { font-weight: 800; padding: 3px 8px; border-radius: 6px; color: white;}
+
+        @media (max-width: 768px) {
+            .welcome-container { flex-direction: column; margin-top: 20px; }
+            .welcome-image { padding: 40px; }
+            .welcome-text { padding: 40px 30px; text-align: center; }
+            .btn-start { margin: 0 auto; }
+            .navbar { position: relative; top: 0; left: 0; margin-bottom: 10px; justify-content: center; width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="header">
-            <i class="fas fa-user-doctor doctor-icon"></i>
-            <h1>Yuk ketahui tingkat kegawatdaruratan kamu!</h1>
-            <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+    <div class="navbar">
+        <i class="fas fa-heartbeat"></i> MedTriage
+    </div>
+
+    <div class="welcome-container" id="welcome-screen">
+        <div class="welcome-text">
+            <h1>Ketahui Tingkat Kegawatdaruratanmu <span>Lebih Cepat</span></h1>
+            <p>Platform cerdas yang dirancang untuk membantu Anda menentukan langkah penanganan medis awal secara cepat dan tepat. Apabila Anda tidak mengetahui parameter tertentu, seperti tekanan darah atau saturasi oksigen, silakan kosongkan bagian tersebut. Sistem kami akan tetap melakukan analisis untuk memberikan estimasi awal kondisi Anda.</p>
+            <button class="btn-start" onclick="openAssessmentModal()">
+                Lanjut Ukur Kegawatdaruratan <i class="fas fa-arrow-right"></i>
+            </button>
+            <div style="margin-top: 30px; font-size: 14px; color: var(--text-gray); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-headset" style="color: var(--success); font-size: 20px;"></i> Bantuan Darurat CS: 0857-0480-9412
+            </div>
         </div>
+        <div class="welcome-image">
+            <img src="https://cdn-icons-png.flaticon.com/512/4320/4320350.png" alt="Pasien di Rumah Sakit">
+        </div>
+    </div>
 
-        <div class="content">
-            <div class="question-section active" id="step-1">
-                <div class="question-title"><i class="fas fa-temperature-high"></i> 1. Suhu Tubuh</div>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectOption(1, 'temperature', 35.5)"><i class="fas fa-snowflake"></i> &lt; 36°C</button>
-                    <button class="option-btn" onclick="selectOption(1, 'temperature', 36.8)"><i class="fas fa-check"></i> 36°C - 37.5°C</button>
-                    <button class="option-btn" onclick="selectOption(1, 'temperature', 38.5)"><i class="fas fa-fire"></i> &gt; 37.5°C</button>
+    <div class="modal-overlay" id="assessment-modal">
+        <div class="assessment-card">
+            <div class="modal-header">
+                <h2><i class="fas fa-clipboard-list"></i> Evaluasi Tingkat Kegawatdaruratan Medis</h2>
+                <button class="close-modal" onclick="closeAssessmentModal()"><i class="fas fa-times"></i></button>
+                <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            </div>
+
+            <div class="modal-body">
+                <div class="question-section active" id="step-1">
+                    <div class="question-title"><i class="fas fa-temperature-high"></i> Suhu Tubuh (°C)</div>
+                    <div class="input-group">
+                        <input type="number" id="input-temperature" min="30" max="45" step="0.1" placeholder="Misal: 36.5" onkeyup="validateInput('temperature', 30, 45)">
+                        <span class="input-hint">Rentang valid: 30.0 - 45.0 °C</span>
+                        <span class="skip-hint">Bisa dikosongkan jika tidak tahu</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="question-section" id="step-2">
-                <div class="question-title"><i class="fas fa-heartbeat"></i> 2. Detak Jantung (BPM)</div>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectOption(2, 'heartrate', 55)"><i class="fas fa-arrow-down"></i> Lambat (&lt;60)</button>
-                    <button class="option-btn" onclick="selectOption(2, 'heartrate', 80)"><i class="fas fa-heart"></i> Normal (60-100)</button>
-                    <button class="option-btn" onclick="selectOption(2, 'heartrate', 115)"><i class="fas fa-arrow-up"></i> Cepat (&gt;100)</button>
+                <div class="question-section" id="step-2">
+                    <div class="question-title"><i class="fas fa-heartbeat"></i> Detak Jantung (BPM)</div>
+                    <div class="input-group">
+                        <input type="number" id="input-heartrate" min="30" max="250" placeholder="Misal: 85" onkeyup="validateInput('heartrate', 30, 250)">
+                        <span class="input-hint">Rentang valid: 30 - 250 BPM</span>
+                        <span class="skip-hint">Bisa dikosongkan jika tidak tahu</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="question-section" id="step-3">
-                <div class="question-title"><i class="fas fa-lungs"></i> 3. Pernapasan</div>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectOption(3, 'resprate', 16)"><i class="fas fa-wind"></i> Normal</button>
-                    <button class="option-btn" onclick="selectOption(3, 'resprate', 25)"><i class="fas fa-lungs-virus"></i> Agak Sesak</button>
-                    <button class="option-btn" onclick="selectOption(3, 'resprate', 35)"><i class="fas fa-head-side-mask"></i> Sangat Sesak</button>
+                <div class="question-section" id="step-3">
+                    <div class="question-title"><i class="fas fa-lungs"></i> Pernapasan (napas/menit)</div>
+                    <div class="input-group">
+                        <input type="number" id="input-resprate" min="5" max="60" placeholder="Misal: 18" onkeyup="validateInput('resprate', 5, 60)">
+                        <span class="input-hint">Rentang valid: 5 - 60 per menit</span>
+                        <span class="skip-hint">Bisa dikosongkan jika tidak tahu</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="question-section" id="step-4">
-                <div class="question-title"><i class="fas fa-atom"></i> 4. Saturasi Oksigen (SpO2)</div>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectOption(4, 'o2sat', 98)"><i class="fas fa-thumbs-up"></i> &gt; 95% (Aman)</button>
-                    <button class="option-btn" onclick="selectOption(4, 'o2sat', 92)"><i class="fas fa-exclamation"></i> 90% - 95%</button>
-                    <button class="option-btn" onclick="selectOption(4, 'o2sat', 85)"><i class="fas fa-triangle-exclamation"></i> &lt; 90% (Rendah)</button>
+                <div class="question-section" id="step-4">
+                    <div class="question-title"><i class="fas fa-atom"></i> Saturasi Oksigen (SpO2 %)</div>
+                    <div class="input-group">
+                        <input type="number" id="input-o2sat" min="50" max="100" placeholder="Misal: 98" onkeyup="validateInput('o2sat', 50, 100)">
+                        <span class="input-hint">Rentang valid: 50 - 100 %</span>
+                        <span class="skip-hint">Bisa dikosongkan jika tidak tahu</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="question-section" id="step-5">
-                <div class="question-title"><i class="fas fa-tint"></i> 5. Tensi Darah Atas (Sistolik)</div>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectOption(5, 'sbp', 85)"><i class="fas fa-arrow-down"></i> Rendah (&lt;90)</button>
-                    <button class="option-btn" onclick="selectOption(5, 'sbp', 110)"><i class="fas fa-check-circle"></i> Normal (90-120)</button>
-                    <button class="option-btn" onclick="selectOption(5, 'sbp', 135)"><i class="fas fa-arrow-up"></i> Tinggi (&gt;120)</button>
+                <div class="question-section" id="step-5">
+                    <div class="question-title"><i class="fas fa-tint"></i> Tensi Darah Atas (Sistolik)</div>
+                    <div class="input-group">
+                        <input type="number" id="input-sbp" min="50" max="250" placeholder="Misal: 120" onkeyup="validateInput('sbp', 50, 250)">
+                        <span class="input-hint">Rentang valid: 50 - 250 mmHg</span>
+                        <span class="skip-hint">Bisa dikosongkan jika tidak tahu</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="question-section" id="step-6">
-                <div class="question-title"><i class="fas fa-tint-slash"></i> 6. Tensi Darah Bawah (Diastolik)</div>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectOption(6, 'dbp', 55)"><i class="fas fa-arrow-down"></i> Rendah (&lt;60)</button>
-                    <button class="option-btn" onclick="selectOption(6, 'dbp', 75)"><i class="fas fa-check-circle"></i> Normal (60-80)</button>
-                    <button class="option-btn" onclick="selectOption(6, 'dbp', 95)"><i class="fas fa-arrow-up"></i> Tinggi (&gt;80)</button>
+                <div class="question-section" id="step-6">
+                    <div class="question-title"><i class="fas fa-tint-slash"></i> Tensi Darah Bawah (Diastolik)</div>
+                    <div class="input-group">
+                        <input type="number" id="input-dbp" min="30" max="150" placeholder="Misal: 80" onkeyup="validateInput('dbp', 30, 150)">
+                        <span class="input-hint">Rentang valid: 30 - 150 mmHg</span>
+                        <span class="skip-hint">Bisa dikosongkan jika tidak tahu</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="question-section" id="step-7">
-                <div class="question-title"><i class="fas fa-face-frown"></i> 7. Tingkat Nyeri</div>
-                <div class="options-grid">
-                    <button class="option-btn" onclick="selectOption(7, 'pain', 2)"><i class="fas fa-face-smile"></i> Ringan (0-3)</button>
-                    <button class="option-btn" onclick="selectOption(7, 'pain', 5)"><i class="fas fa-face-meh"></i> Sedang (4-6)</button>
-                    <button class="option-btn" onclick="selectOption(7, 'pain', 8)"><i class="fas fa-face-sad-tear"></i> Berat (7-10)</button>
+                <div class="question-section" id="step-7">
+                    <div class="question-title"><i class="fas fa-face-frown"></i> Skala Nyeri (0-10)</div>
+                    <div style="font-size: 13px; color: var(--text-gray); margin: -10px auto 20px auto; max-width: 400px; text-align: left; line-height: 1.6; background: var(--bg-gray); padding: 15px; border-radius: 8px;">
+                        <strong>Panduan Pengisian Skala Nyeri:</strong><br>
+                        • <strong>0</strong> : Tidak ada rasa nyeri sama sekali.<br>
+                        • <strong>1 - 3</strong> : Nyeri ringan (masih bisa ditahan dan beraktivitas biasa).<br>
+                        • <strong>4 - 6</strong> : Nyeri sedang (cukup mengganggu aktivitas, butuh obat pereda nyeri).<br>
+                        • <strong>7 - 10</strong> : Nyeri sangat berat (tidak tertahankan, membuat tidak bisa beraktivitas sama sekali).
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="input-pain" min="0" max="10" placeholder="Misal: 4" onkeyup="validateInput('pain', 0, 10)">
+                        <span class="input-hint">Rentang valid: 0 - 10</span>
+                        <span class="skip-hint">Bisa dikosongkan jika tidak tahu</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="question-section" id="step-8" style="text-align: center;">
-                <h2 style="color: var(--primary-blue);">Hasil Prediksi Model Decision Tree</h2>
-                <div id="loading" style="display:none;"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Menganalisis...</div>
-                <div id="result-badge" class="status-badge"></div>
-                <div id="recommendation-box" style="margin-top: 20px; text-align: left; background: var(--light-blue); padding: 15px; border-radius: 8px;"></div>
-                <button class="nav-btn btn-next" style="margin-top: 30px;" onclick="location.reload()"><i class="fas fa-rotate-right"></i> Cek Ulang</button>
-            </div>
+                <div class="question-section" id="step-8" style="text-align: center;">
+                    <div id="loading" style="display:none; margin: 30px 0;">
+                        <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--accent-blue);"></i><br><br>Menganalisis data vital...
+                    </div>
+                    
+                    <div id="result-content" style="display: none;">
+                        <div id="main-diagnosis-area">
+                            <div id="result-badge" class="status-badge"></div>
+                            <div id="recommendation-box" style="font-size: 16px; margin-bottom: 10px;"></div>
+                        </div>
+                        
+                        <div class="confidence-container">
+                            <div class="confidence-header">
+                                <span>Akurasi Prediksi</span>
+                                <span id="confidence-text">0%</span>
+                            </div>
+                            <div class="confidence-bar-bg">
+                                <div class="confidence-bar-fill" id="confidence-bar"></div>
+                            </div>
+                        </div>
 
-            <div class="navigation" id="nav-container">
-                <button class="nav-btn btn-prev" id="btn-prev" onclick="prevStep()" style="visibility: hidden;">Kembali</button>
-                <button class="nav-btn btn-next" id="btn-next" onclick="nextStep()" disabled>Selanjutnya <i class="fas fa-arrow-right"></i></button>
+                        <div class="insight-box" id="insight-box"></div>
+                        
+                        <div id="advice-container" class="advice-box">
+                            <h4><i class="fas fa-notes-medical"></i> Estimasi Waktu Penanganan Rumah Sakit:</h4>
+                            <div id="handling-steps"></div>
+                        </div>
+
+                        <div class="action-container">
+                            <a id="btn-hospital" href="https://maps.google.com/?q=rumah+sakit" target="_blank" class="btn-action btn-hospital">
+                                <i class="fas fa-ambulance"></i> Cari RS Terdekat
+                            </a>
+                            <a href="https://www.halodoc.com/tanya-dokter" target="_blank" class="btn-action btn-halodoc">
+                                <i class="fas fa-user-md"></i> Konsultasi Dokter
+                            </a>
+                            <button onclick="resetAssessmentForm()" class="btn-action btn-outline">
+                                <i class="fas fa-redo-alt"></i> Ukur Ulang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation" id="nav-container">
+                    <button class="nav-btn btn-prev" id="btn-prev" onclick="prevStep()" style="visibility: hidden;"><i class="fas fa-arrow-left"></i> Kembali</button>
+                    <button class="nav-btn btn-next" id="btn-next" onclick="nextStep()">Selanjutnya <i class="fas fa-arrow-right"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -131,22 +446,50 @@
         let currentStep = 1;
         const totalSteps = 7;
         
-        // Objek untuk menampung data yang akan dikirim ke Python
         let patientData = {
-            temperature: null, heartrate: null, resprate: null, 
-            o2sat: null, sbp: null, dbp: null, pain: null
+            temperature: "", heartrate: "", resprate: "", 
+            o2sat: "", sbp: "", dbp: "", pain: ""
         };
 
-        // Update progres awal
-        document.getElementById('progress').style.width = `14%`;
+        const acuityNames = {
+            1: { name: 'ACUITY 1 (RESUSITASI)', color: '#dc3545' },
+            2: { name: 'ACUITY 2 (EMERGENT)', color: '#fd7e14' },
+            3: { name: 'ACUITY 3 (URGENT)', color: '#ffc107' },
+            4: { name: 'ACUITY 4 (LESS URGENT)', color: '#28a745' },
+            5: { name: 'ACUITY 5 (NON URGENT)', color: '#17a2b8' }
+        };
 
-        function selectOption(step, key, value) {
-            const buttons = document.querySelectorAll(`#step-${step} .option-btn`);
-            buttons.forEach(btn => btn.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
+        function openAssessmentModal() {
+            document.getElementById('assessment-modal').classList.add('active');
+            updateProgress();
+        }
+
+        function closeAssessmentModal() {
+            document.getElementById('assessment-modal').classList.remove('active');
+        }
+
+        function validateInput(key, min, max) {
+            const inputField = document.getElementById(`input-${key}`);
+            const valStr = inputField.value.trim();
+            const val = parseFloat(valStr);
             
-            patientData[key] = value;
-            document.getElementById('btn-next').disabled = false;
+            if (valStr === "") {
+                patientData[key] = "";
+                inputField.style.borderColor = "var(--light-blue)";
+                document.getElementById('btn-next').disabled = false;
+            } else if (!isNaN(val) && val >= min && val <= max) {
+                patientData[key] = val;
+                inputField.style.borderColor = "var(--success)";
+                document.getElementById('btn-next').disabled = false;
+            } else {
+                patientData[key] = null;
+                inputField.style.borderColor = "var(--danger)";
+                document.getElementById('btn-next').disabled = true;
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('progress').style.width = `${(currentStep / totalSteps) * 100}%`;
         }
 
         function nextStep() {
@@ -155,17 +498,15 @@
                 currentStep++;
                 document.getElementById(`step-${currentStep}`).classList.add('active');
                 
-                document.getElementById('progress').style.width = `${(currentStep / totalSteps) * 100}%`;
+                updateProgress();
                 document.getElementById('btn-prev').style.visibility = 'visible';
                 
-                // Cek data di step selanjutnya
                 const keys = Object.keys(patientData);
-                if (patientData[keys[currentStep-1]] === null) {
-                    document.getElementById('btn-next').disabled = true;
-                }
+                const nextKey = keys[currentStep-1];
+                document.getElementById('btn-next').disabled = (patientData[nextKey] === null);
                 
                 if (currentStep === totalSteps) {
-                    document.getElementById('btn-next').innerHTML = 'Prediksi Acuity <i class="fas fa-robot"></i>';
+                    document.getElementById('btn-next').innerHTML = 'Analisis Sekarang <i class="fas fa-laptop-medical"></i>';
                 }
             } else if (currentStep === totalSteps) {
                 submitToModel();
@@ -178,13 +519,14 @@
                 currentStep--;
                 document.getElementById(`step-${currentStep}`).classList.add('active');
                 
-                document.getElementById('progress').style.width = `${(currentStep / totalSteps) * 100}%`;
+                updateProgress();
                 document.getElementById('btn-next').innerHTML = 'Selanjutnya <i class="fas fa-arrow-right"></i>';
-                document.getElementById('btn-next').disabled = false;
                 
-                if (currentStep === 1) {
-                    document.getElementById('btn-prev').style.visibility = 'hidden';
-                }
+                const keys = Object.keys(patientData);
+                const prevKey = keys[currentStep-1];
+                document.getElementById('btn-next').disabled = (patientData[prevKey] === null);
+                
+                if (currentStep === 1) { document.getElementById('btn-prev').style.visibility = 'hidden'; }
             }
         }
 
@@ -192,47 +534,142 @@
             document.getElementById('nav-container').style.display = 'none';
             document.getElementById(`step-${totalSteps}`).classList.remove('active');
             document.getElementById('step-8').classList.add('active');
+            
             document.getElementById('loading').style.display = 'block';
+            document.getElementById('result-content').style.display = 'none';
 
             try {
-                // Mengirim data ke Python Flask API
-                const response = await fetch('/predict', {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(patientData)
                 });
                 
+                if (!response.ok) { throw new Error(`Koneksi server gagal (${response.status})`); }
                 const result = await response.json();
-                document.getElementById('loading').style.display = 'none';
-                
-                const badge = document.getElementById('result-badge');
-                const rec = document.getElementById('recommendation-box');
-                
-                // Mengolah hasil dari model (Acuity 1 - 5)
-                const acuity = result.acuity;
-                badge.className = `status-badge status-${acuity}`;
-                
-                if (acuity === 1) {
-                    badge.innerText = 'ACUITY 1 (RESUSITASI)';
-                    rec.innerHTML = '<b>Rekomendasi:</b> Pasien dalam kondisi kritis. Segera berikan penanganan gawat darurat (Merah)!';
-                } else if (acuity === 2) {
-                    badge.innerText = 'ACUITY 2 (EMERGENT)';
-                    rec.innerHTML = '<b>Rekomendasi:</b> Risiko tinggi! Butuh evaluasi dokter segera dalam hitungan menit (Oranye).';
-                } else if (acuity === 3) {
-                    badge.innerText = 'ACUITY 3 (URGENT)';
-                    rec.innerHTML = '<b>Rekomendasi:</b> Kondisi mendesak. Pasien membutuhkan beberapa sumber daya rumah sakit (Kuning).';
-                } else if (acuity === 4) {
-                    badge.innerText = 'ACUITY 4 (LESS URGENT)';
-                    rec.innerHTML = '<b>Rekomendasi:</b> Kondisi stabil. Bisa menunggu dengan aman (Hijau).';
-                } else {
-                    badge.innerText = 'ACUITY 5 (NON URGENT)';
-                    rec.innerHTML = '<b>Rekomendasi:</b> Tidak gawat. Pasien aman untuk berobat jalan (Biru).';
-                }
+                if (result.error) { throw new Error(result.error); }
+
+                displayResult(result.acuity, result.confidence, result.is_incomplete, result.hypotheticals);
                 
             } catch (error) {
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('recommendation-box').innerHTML = '<span style="color:red;">Gagal terhubung ke model. Pastikan file app.py sudah berjalan (Flask server hidup).</span>';
+                document.getElementById('result-badge').className = 'status-badge status-1';
+                document.getElementById('result-badge').innerText = 'ERROR KONEKSI';
+                document.getElementById('recommendation-box').innerHTML = `Gagal memuat prediksi. Pastikan app.py berjalan. Error: ${error.message}`;
+                document.getElementById('main-diagnosis-area').style.display = 'block';
+                document.getElementById('result-content').style.display = 'block';
             }
+        }
+
+        function displayResult(acuity, confidence, is_incomplete, hypotheticals) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('result-content').style.display = 'block';
+            
+            const mainArea = document.getElementById('main-diagnosis-area');
+            const badge = document.getElementById('result-badge');
+            const rec = document.getElementById('recommendation-box');
+            const adviceContainer = document.getElementById('advice-container');
+            const handlingSteps = document.getElementById('handling-steps');
+            const insightBox = document.getElementById('insight-box');
+            const btnHospital = document.getElementById('btn-hospital');
+
+            // Nilai diupdate di belakang layar, bar visual utama tetap di-hide lewat CSS
+            document.getElementById('confidence-text').innerText = `${confidence}%`;
+            setTimeout(() => { document.getElementById('confidence-bar').style.width = `${confidence}%`; }, 300);
+
+            btnHospital.style.display = 'inline-flex';
+
+            // Kumpulan Data Waktu Penanganan Berdasarkan Standar ESI / ATS Resmi
+            const saranPenanganan = {
+                1: 'Pasien harus segera mendapatkan tindakan medis di Rumah Sakit atau IGD saat ini juga (Waktu Respons: 0 menit / Segera) karena kondisi mengancam nyawa langsung.',
+                2: 'Pasien harus sudah berada di Rumah Sakit atau IGD dalam waktu maksimal 10 menit karena kondisi berisiko tinggi memburuk dengan cepat.',
+                3: 'Pasien harus tiba di Rumah Sakit atau IGD dalam waktu maksimal 30 menit demi mencegah potensi komplikasi berat.',
+                4: 'Kondisi stabil secara fisiologis. Pasien disarankan mengunjungi Rumah Sakit atau klinik dalam waktu maksimal 60 menit apabila gejala menetap.',
+                5: 'Kondisi non-urgensi. Pasien dapat mendatangi Rumah Sakit atau fasilitas kesehatan terdekat dalam kurun waktu 120 menit (2 jam) jika memerlukan pemeriksaan rutin.'
+            };
+
+            if (is_incomplete) {
+                mainArea.style.display = 'none';
+                adviceContainer.style.display = 'none';
+                insightBox.style.display = 'block';
+                
+                let insightHTML = `<h5 style="color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-project-diagram"></i> Simulasi Potensial Rumah Sakit (Berdasarkan Gejala Tambahan)</h5>`;
+                
+                hypotheticals.forEach(h => {
+                    const hAcuity = acuityNames[h.acuity];
+                    const hSaran = saranPenanganan[h.acuity];
+                    
+                    insightHTML += `
+                    <div style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 8px; border-left: 4px solid ${hAcuity.color}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span class="highlight-acuity" style="background-color: ${hAcuity.color}; font-size: 11px;">${hAcuity.name}</span>
+                            <strong style="color: var(--text-dark); font-size: 12px;">Kemungkinan: ${h.confidence}%</strong>
+                        </div>
+                        <p style="margin: 0 0 10px 0; color: var(--text-gray); font-size: 13.5px;">
+                            <b>[${h.title}]</b> Jika disertai rasa <b>${h.symptoms}</b>.
+                        </p>
+                        <div style="font-size: 12.5px; background: var(--light-blue); padding: 8px 12px; border-radius: 6px; color: var(--text-dark); display: flex; gap: 8px; text-align: left;">
+                            <i class="fas fa-clock" style="color: var(--primary-blue); margin-top: 3px;"></i> 
+                            <span>${hSaran}</span>
+                        </div>
+                    </div>`;
+                });
+                
+                insightHTML += `<p style="font-size: 12.5px; color: var(--danger); margin-top: 10px; text-align: center;"><em>*Sistem tidak dapat memberi limitasi pasti akibat data utama yang kosong. Gunakan tombol di bawah jika membutuhkan evakuasi segera.</em></p>`;
+                insightBox.innerHTML = insightHTML;
+
+            } else {
+                mainArea.style.display = 'block';
+                adviceContainer.style.display = 'block';
+                insightBox.style.display = 'none';
+                
+                badge.className = `status-badge status-${acuity}`;
+                badge.innerText = acuityNames[acuity].name;
+                
+                if (acuity === 1) {
+                    rec.innerHTML = '<b>Level 1 (Resusitasi):</b> Ancaman jiwa langsung.';
+                    handlingSteps.innerHTML = `<ul><li>${saranPenanganan[1]}</li></ul>`;
+                    adviceContainer.style.borderLeftColor = acuityNames[1].color;
+                } else if (acuity === 2) {
+                    rec.innerHTML = '<b>Level 2 (Emergent):</b> Risiko tinggi memburuk cepat.';
+                    handlingSteps.innerHTML = `<ul><li>${saranPenanganan[2]}</li></ul>`;
+                    adviceContainer.style.borderLeftColor = acuityNames[2].color;
+                } else if (acuity === 3) {
+                    rec.innerHTML = '<b>Level 3 (Urgent):</b> Kondisi akut memerlukan penanganan.';
+                    handlingSteps.innerHTML = `<ul><li>${saranPenanganan[3]}</li></ul>`;
+                    adviceContainer.style.borderLeftColor = acuityNames[3].color;
+                } else if (acuity === 4) {
+                    rec.innerHTML = '<b>Level 4 (Less Urgent):</b> Kondisi stabil, risiko rendah.';
+                    handlingSteps.innerHTML = `<ul><li>${saranPenanganan[4]}</li></ul>`;
+                    adviceContainer.style.borderLeftColor = acuityNames[4].color;
+                } else {
+                    rec.innerHTML = '<b>Level 5 (Non Urgent):</b> Masalah klinis ringan / kronis.';
+                    handlingSteps.innerHTML = `<ul><li>${saranPenanganan[5]}</li></ul>`;
+                    adviceContainer.style.borderLeftColor = acuityNames[5].color;
+                }
+            }
+        }
+
+        function resetAssessmentForm() {
+            currentStep = 1;
+            patientData = { temperature: "", heartrate: "", resprate: "", o2sat: "", sbp: "", dbp: "", pain: "" };
+            
+            const fields = ['temperature', 'heartrate', 'resprate', 'o2sat', 'sbp', 'dbp', 'pain'];
+            fields.forEach(field => {
+                const element = document.getElementById(`input-${field}`);
+                element.value = "";
+                element.style.borderColor = "var(--light-blue)";
+            });
+
+            document.getElementById('confidence-bar').style.width = "0%";
+            document.getElementById('step-8').classList.remove('active');
+            document.getElementById('step-1').classList.add('active');
+            
+            document.getElementById('btn-prev').style.visibility = 'hidden';
+            document.getElementById('btn-next').disabled = false;
+            document.getElementById('btn-next').innerHTML = 'Selanjutnya <i class="fas fa-arrow-right"></i>';
+            document.getElementById('nav-container').style.display = 'flex';
+            updateProgress();
         }
     </script>
 </body>
